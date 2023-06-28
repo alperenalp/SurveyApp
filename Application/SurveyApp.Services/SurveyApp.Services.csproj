@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="12.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\Domain\SurveyApp.Entities\SurveyApp.Entities.csproj" />
     <ProjectReference Include="..\..\Infrastructure\SurveyApp.Infrastructure\SurveyApp.Infrastructure.csproj" />
     <ProjectReference Include="..\SurveyApp.DTOs\SurveyApp.DTOs.csproj" />

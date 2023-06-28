@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace SurveyApp.Infrastructure.Repositories
 {
-    public class EFOptionRepository : IOption
+    public class EFOptionRepository : IOptionRepository
     {
         private readonly SurveyAppDbContext _context;
 

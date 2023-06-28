@@ -9,5 +9,6 @@ namespace SurveyApp.Infrastructure.Repositories
 {
     public interface IQuestionRepository : IRepository<Question>
     {
+        public Task<int> CreateQuestionAsync(Question question);
     }
 }

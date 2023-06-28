@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SurveyApp.Infrastructure.Repositories
 {
-    public interface IOption : IRepository<Option>
+    public interface IOptionRepository : IRepository<Option>
     {
 
     }

@@ -24,6 +24,13 @@ namespace SurveyApp.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
+        public async Task<int> CreateQuestionAsync(Question question)
+        {
+            await _context.Questions.AddAsync(question);
+            await _context.SaveChangesAsync();
+            return question.Id;
+        }
+
         public async Task DeleteAsync(int id)
         {
             var question = await _context.Questions.FindAsync(id);

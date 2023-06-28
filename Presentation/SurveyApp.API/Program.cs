@@ -1,14 +1,19 @@
 using Microsoft.EntityFrameworkCore;
+using SurveyApp.API.Extensions;
 using SurveyApp.Infrastructure.Data;
+using SurveyApp.Infrastructure.Repositories;
+using SurveyApp.Services.Mappings;
+using SurveyApp.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
+
 builder.Services.AddControllers();
 
-var connectionString = builder.Configuration.GetConnectionString("db");
-builder.Services.AddDbContext<SurveyAppDbContext>(opt => opt.UseSqlServer(connectionString));
+builder.AddInjections();
+
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
