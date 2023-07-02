@@ -1,7 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Routing;
 using SurveyApp.API.Models;
 using SurveyApp.DTOs.Requests;
+using SurveyApp.Entities;
 using SurveyApp.Services;
 
 namespace SurveyApp.API.Controllers
@@ -21,6 +25,7 @@ namespace SurveyApp.API.Controllers
             _surveyService = surveyService;
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Create(SurveyRequestVM surveyVM)
         {
@@ -38,9 +43,28 @@ namespace SurveyApp.API.Controllers
                         await _optionService.CreateOptionAsync(option);
                     }
                 }
-                return Ok();
+                string link = HttpContext.Request.Host.ToString() + Url.Action("Test", new { id = surveyId });
+                return Ok(link);
             }
             return BadRequest(ModelState);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Test(int id)
+        {
+            return Ok();
+        }
+
+        [HttpGet("{surveyId}")]
+        public async Task<IActionResult> Share(int surveyId)
+        {
+            if (await _surveyService.IsSurveyExistsAsync(surveyId))
+            {
+                var link = HttpContext.Request.Host.ToString() + Url.Action("Test", new { id = surveyId });
+                return Ok(link);
+            }
+            return NotFound();
+        }
     }
+
 }

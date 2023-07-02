@@ -41,6 +41,11 @@ namespace SurveyApp.Infrastructure.Repositories
             return await _context.Options.AsNoTracking().SingleOrDefaultAsync(x => x.Id == id);
         }
 
+        public async Task<bool> IsExistsAsync(int id)
+        {
+            return await _context.Options.AnyAsync(x => x.Id == id);
+        }
+
         public async Task UpdateAsync(Option entity)
         {
             _context.Options.Update(entity);

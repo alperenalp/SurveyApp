@@ -1,4 +1,5 @@
 ﻿using SurveyApp.DTOs.Requests;
+using SurveyApp.DTOs.Responses;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,5 +11,7 @@ namespace SurveyApp.Services
     public interface ISurveyService
     {
         Task<int> CreateSurveyAsync(CreateNewSurveyRequest request);
+        Task<SurveyDisplayResponse> GetSurveyByIdAsync(int id);
+        Task<bool> IsSurveyExistsAsync(int id);
     }
 }

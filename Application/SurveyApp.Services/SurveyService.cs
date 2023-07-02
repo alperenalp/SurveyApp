@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using SurveyApp.DTOs.Requests;
+using SurveyApp.DTOs.Responses;
 using SurveyApp.Infrastructure.Repositories;
 using SurveyApp.Services.Extensions;
 using System;
@@ -27,6 +28,18 @@ namespace SurveyApp.Services
             survey.CreatedAt = DateTime.Now;
             int surveyId = await _repository.CreateSurveyAsync(survey);
             return surveyId;
+        }
+
+        public async Task<SurveyDisplayResponse> GetSurveyByIdAsync(int id)
+        {
+            var survey = await _repository.GetByIdAsync(id);
+            var response = survey.ConvertToDto<SurveyDisplayResponse>(_mapper);
+            return response;
+        }
+
+        public async Task<bool> IsSurveyExistsAsync(int id)
+        {
+            return await _repository.IsExistsAsync(id);
         }
     }
 }

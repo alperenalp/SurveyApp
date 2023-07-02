@@ -53,5 +53,10 @@ namespace SurveyApp.Infrastructure.Repositories
             _context.Surveys.Update(entity);
             await _context.SaveChangesAsync();
         }
+
+        public async Task<bool> IsExistsAsync(int id)
+        {
+            return await _context.Surveys.AnyAsync(x => x.Id == id);
+        }
     }
 }

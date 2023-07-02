@@ -14,5 +14,6 @@ namespace SurveyApp.Infrastructure.Repositories
         Task DeleteAsync(int id);
         Task<T> GetByIdAsync(int id);
         Task<IList<T>> GetAllAsync();
+        Task<bool> IsExistsAsync(int id);
     }
 }
