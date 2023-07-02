@@ -26,6 +26,7 @@ namespace SurveyApp.Services
         public async Task CreateUserAsync(CreateNewUserRequest request)
         {
             var user = request.ConvertToUser(_mapper);
+            user.Role = "Client";
             await _repository.CreateAsync(user);
         }
 

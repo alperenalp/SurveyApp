@@ -28,6 +28,11 @@ namespace SurveyApp.Services.Extensions
             return mapper.Map<T>(question);
         }
 
+        public static T ConvertToDto<T>(this IList<Question> request, IMapper mapper)
+        {
+            return mapper.Map<T>(request);
+        }
+
         public static Question ConvertToQuestion<T>(this T request, IMapper mapper)
         {
             return mapper.Map<Question>(request);
@@ -38,6 +43,11 @@ namespace SurveyApp.Services.Extensions
         public static T ConvertToDto<T>(this Option option, IMapper mapper)
         {
             return mapper.Map<T>(option);
+        }
+
+        public static T ConvertToDto<T>(this IList<Option> request, IMapper mapper)
+        {
+            return mapper.Map<T>(request);
         }
 
         public static Option ConvertToOption<T>(this T request, IMapper mapper)

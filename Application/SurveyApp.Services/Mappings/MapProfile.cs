@@ -18,8 +18,10 @@ namespace SurveyApp.Services.Mappings
             CreateMap<Survey, SurveyDisplayResponse>().ReverseMap();
 
             CreateMap<Question, CreateNewQuestionRequest>().ReverseMap();
+            CreateMap<Question, QuestionDisplayResponse>().ReverseMap();
 
             CreateMap<Option, CreateNewOptionRequest>().ReverseMap();
+            CreateMap<Option, OptionDisplayResponse>().ReverseMap();
 
             CreateMap<User, CreateNewUserRequest>().ReverseMap();
             CreateMap<User, ValidateUserResponse>().ReverseMap();

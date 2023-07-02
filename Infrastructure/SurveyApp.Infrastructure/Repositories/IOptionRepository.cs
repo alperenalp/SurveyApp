@@ -9,6 +9,6 @@ namespace SurveyApp.Infrastructure.Repositories
 {
     public interface IOptionRepository : IRepository<Option>
     {
-
+        Task<IList<Option>> GetAllByQuestionId(int questionId);
     }
 }

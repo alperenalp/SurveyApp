@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using SurveyApp.DTOs.Requests;
+using SurveyApp.DTOs.Responses;
+using SurveyApp.Entities;
 using SurveyApp.Infrastructure.Repositories;
 using SurveyApp.Services.Extensions;
 using System;
@@ -25,6 +27,13 @@ namespace SurveyApp.Services
         {
             var option = request.ConvertToOption(_mapper);
             await _repository.CreateAsync(option);
+        }
+
+        public async Task<IEnumerable<OptionDisplayResponse>> GetOptionsByQuestionIdAsync(int questionId)
+        {
+            var options = await _repository.GetAllByQuestionId(questionId);
+            var response = options.ConvertToDto<IEnumerable<OptionDisplayResponse>>(_mapper);
+            return response;
         }
     }
 }

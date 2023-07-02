@@ -2,6 +2,7 @@
 using SurveyApp.Entities;
 using SurveyApp.Infrastructure.Data;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -57,6 +58,11 @@ namespace SurveyApp.Infrastructure.Repositories
         {
             _context.Questions.Update(entity);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<IList<Question>> GetAllBySurveyId(int surveyId)
+        {
+            return await _context.Questions.AsNoTracking().Where(x => x.SurveyId == surveyId).ToListAsync();
         }
     }
 }

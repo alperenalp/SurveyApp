@@ -58,5 +58,10 @@ namespace SurveyApp.Infrastructure.Repositories
         {
             return await _context.Surveys.AnyAsync(x => x.Id == id);
         }
+
+        public async Task<Survey> GetByIdForFillAsync(int id)
+        {
+            return await _context.Surveys.AsNoTracking().Include(x=>x.Questions).ThenInclude(x=>x.Options).SingleOrDefaultAsync(x => x.Id == id);
+        }
     }
 }

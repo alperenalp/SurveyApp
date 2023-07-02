@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using SurveyApp.DTOs.Requests;
+using SurveyApp.DTOs.Responses;
 using SurveyApp.Infrastructure.Repositories;
 using SurveyApp.Services.Extensions;
 using System;
@@ -26,6 +27,13 @@ namespace SurveyApp.Services
             var question = request.ConvertToQuestion(_mapper);
             int id = await _repository.CreateQuestionAsync(question);
             return id;
+        }
+
+        public async Task<IEnumerable<QuestionDisplayResponse>> GetQuestionsBySurveyIdAsync(int surveyId)
+        {
+            var questions = await _repository.GetAllBySurveyId(surveyId);
+            var response = questions.ConvertToDto<IEnumerable<QuestionDisplayResponse>>(_mapper);
+            return response;
         }
     }
 }

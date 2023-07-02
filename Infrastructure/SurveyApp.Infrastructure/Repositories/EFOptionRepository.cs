@@ -36,6 +36,11 @@ namespace SurveyApp.Infrastructure.Repositories
             return await _context.Options.AsNoTracking().ToListAsync();
         }
 
+        public async Task<IList<Option>> GetAllByQuestionId(int questionId)
+        {
+            return await _context.Options.AsNoTracking().Where(x => x.QuestionId == questionId).ToListAsync();
+        }
+
         public async Task<Option> GetByIdAsync(int id)
         {
             return await _context.Options.AsNoTracking().SingleOrDefaultAsync(x => x.Id == id);
