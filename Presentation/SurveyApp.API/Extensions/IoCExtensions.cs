@@ -19,6 +19,9 @@ namespace SurveyApp.API.Extensions
             builder.Services.AddScoped<IOptionService, OptionService>();
             builder.Services.AddScoped<IOptionRepository, EFOptionRepository>();
 
+            builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<IUserRepository, EFUserRepository>();
+
             builder.Services.AddAutoMapper(typeof(MapProfile));
 
             var connectionString = builder.Configuration.GetConnectionString("db");

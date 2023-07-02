@@ -41,10 +41,27 @@ namespace SurveyApp.Infrastructure.Repositories
             return await _context.Users.AsNoTracking().SingleOrDefaultAsync(x => x.Id == id);
         }
 
+        public async Task<bool> IsExistsAsync(int id)
+        {
+            return await _context.Users.AnyAsync(x => x.Id == id);
+        }
+
         public async Task UpdateAsync(User entity)
         {
             _context.Users.Update(entity);
             await _context.SaveChangesAsync();
         }
+
+        public async Task<User> ValidateUserAsync(string username, string password)
+        {
+            return await _context.Users.SingleOrDefaultAsync(u => u.Username == username && u.Password == password);
+        }
+        
+        public async Task<User> GetUserByEmailAsync(string email)
+        {
+            return await _context.Users.SingleOrDefaultAsync(u => u.Email == email);
+        }
+
+        
     }
 }

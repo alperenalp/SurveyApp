@@ -45,6 +45,15 @@ namespace SurveyApp.Services.Extensions
             return mapper.Map<Option>(request);
         }
 
+        //User
+        public static T ConvertToDto<T>(this User user, IMapper mapper)
+        {
+            return mapper.Map<T>(user);
+        }
 
+        public static User ConvertToUser<T>(this T request, IMapper mapper)
+        {
+            return mapper.Map<User>(request);
+        }
     }
 }
