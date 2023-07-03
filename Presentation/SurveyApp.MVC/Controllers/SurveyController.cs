@@ -58,7 +58,7 @@ namespace SurveyApp.MVC.Controllers
                     var optionVM = new OptionDisplayVM { Title = option.Title };
                     optionListVM.Add(optionVM);
                 }
-                var questionVM = new QuestionDisplayVM { Title = question.Title, Options = optionListVM };
+                var questionVM = new QuestionDisplayVM { Title = question.Title, Options = optionListVM, Type = question.Type };
                 questionListVM.Add(questionVM);
             }
 

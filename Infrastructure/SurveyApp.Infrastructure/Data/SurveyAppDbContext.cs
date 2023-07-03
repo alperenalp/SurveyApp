@@ -54,6 +54,7 @@ namespace SurveyApp.Infrastructure.Data
             //Question
             modelBuilder.Entity<Question>().Property(q => q.Title).IsRequired();
             modelBuilder.Entity<Question>().Property(q => q.Title).HasMaxLength(100);
+            modelBuilder.Entity<Question>().Property(q => q.Type).IsRequired();
 
             modelBuilder.Entity<Question>().HasMany(q => q.Options)
                                            .WithOne(o => o.Question)

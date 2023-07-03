@@ -46,7 +46,7 @@ namespace SurveyApp.API.Controllers
             var surveyId = await _surveyService.CreateSurveyAsync(survey);
             foreach (var questionVM in surveyVM.Questions)
             {
-                var question = new CreateNewQuestionRequest { Title = questionVM.Title, SurveyId = surveyId };
+                var question = new CreateNewQuestionRequest { Title = questionVM.Title, SurveyId = surveyId, Type = questionVM.Type };
                 var questionId = await _questionService.CreateQuestionAsync(question);
                 foreach (var optionVM in questionVM.Options)
                 {
@@ -105,7 +105,7 @@ namespace SurveyApp.API.Controllers
                     var optionVM = new OptionDisplayVM { Title = option.Title };
                     optionListVM.Add(optionVM);
                 }
-                var questionVM = new QuestionDisplayVM { Title = question.Title, Options = optionListVM };
+                var questionVM = new QuestionDisplayVM { Title = question.Title, Options = optionListVM, Type = question.Type};
                 questionListVM.Add(questionVM);
             }
 

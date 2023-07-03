@@ -12,8 +12,18 @@ namespace SurveyApp.Entities
     {
         public int Id { get; set; }
         public string Title { get; set; }
+        public Types Type { get; set; }
         public int SurveyId { get; set; }
         public Survey Survey { get; set; }
         public IList<Option> Options { get; set; }
+    }
+
+    public enum Types
+    {
+        SingleLine = 0,
+        MultiLine = 1,
+        RadioButton = 2,
+        Checkbox = 3,
+        Rating = 4,
     }
 }

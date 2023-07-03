@@ -9,6 +9,7 @@ namespace SurveyApp.DTOs.Requests
     public class CreateNewQuestionRequest
     {
         public string Title { get; set; }
+        public int Type { get; set; }
         public int SurveyId { get; set; }
     }
 }

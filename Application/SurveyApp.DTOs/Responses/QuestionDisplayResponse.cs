@@ -10,5 +10,6 @@ namespace SurveyApp.DTOs.Responses
     {
         public int Id { get; set; }
         public string Title { get; set; }
+        public int Type { get; set; }
     }
 }
