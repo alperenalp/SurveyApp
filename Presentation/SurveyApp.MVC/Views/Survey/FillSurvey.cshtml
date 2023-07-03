@@ -1,0 +1,46 @@
+﻿@model SurveyApp.MVC.Models.SurveyDisplayVM
+
+@{
+    ViewData["Title"] = "FillSurvey";
+}
+
+<h1 class="text-center">
+    <b>@Html.DisplayFor(modelItem => Model.SurveyTitle)</b>
+</h1>
+
+<hr />
+
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="FillSurvey">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                @foreach (var question in Model.Questions)
+                {
+                    <div class="form-group">
+                        <div class="form-control-plaintext">
+                            <b>@Html.DisplayFor(modelItem => question.Title)</b>
+                        </div>
+                        @foreach (var option in question.Options)
+                        {
+                            <div class="form-group">
+                                @Html.DisplayFor(modelItem => option.Title)
+                            </div>
+                        }
+                    </div>
+                    <hr />
+                }
+            </div>
+            <div class="form-group mt-5">
+                <input type="submit" value="Oyla" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
