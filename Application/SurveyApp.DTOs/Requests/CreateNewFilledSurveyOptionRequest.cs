@@ -4,14 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SurveyApp.Entities
+namespace SurveyApp.DTOs.Requests
 {
-    public class FilledSurveyOption
+    public class CreateNewFilledSurveyOptionRequest
     {
         public int FilledSurveyId { get; set; }
-        public FilledSurvey FilledSurvey { get; set; }
         public int OptionId { get; set; }
-        public Option Option { get; set; }
-        public string? Text { get; set; }
+        public string Text { get; set; }
     }
 }

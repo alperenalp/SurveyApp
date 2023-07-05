@@ -24,6 +24,26 @@ namespace SurveyApp.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
+        public async Task<int> CreateFilledSurveyAsync(FilledSurvey filledSurvey)
+        {
+            _context.FilledSurveys.Add(filledSurvey);
+            await _context.SaveChangesAsync();
+            return filledSurvey.Id;
+        }
+
+        public async Task CreateFilledSurveyOptionAsync(FilledSurveyOption filledSurveyOption)
+        {
+            _context.FilledSurveyOptions.Add(filledSurveyOption);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<bool> CreateWithIsSuccesAsync(FilledSurvey filledSurvey)
+        {
+            _context.FilledSurveys.Add(filledSurvey);
+            var result = await _context.SaveChangesAsync();
+            return result > 1;
+        }
+
         public async Task DeleteAsync(int id)
         {
             var filledSurvey = await _context.FilledSurveys.FindAsync(id);

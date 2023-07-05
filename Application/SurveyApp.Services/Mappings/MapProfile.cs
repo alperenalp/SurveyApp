@@ -26,6 +26,10 @@ namespace SurveyApp.Services.Mappings
             CreateMap<User, CreateNewUserRequest>().ReverseMap();
             CreateMap<User, ValidateUserResponse>().ReverseMap();
 
+            CreateMap<FilledSurvey, CreateNewFilledSurveyRequest>().ReverseMap();
+
+            CreateMap<FilledSurveyOption, CreateNewFilledSurveyOptionRequest >().ReverseMap();
+
         }
     }
 }

@@ -1,11 +1,11 @@
-﻿@model SurveyApp.MVC.Models.SurveyDisplayVM
+﻿@model SurveyApp.MVC.Models.SurveyAnswerDisplayVM
 
 @{
     ViewData["Title"] = "FillSurvey";
 }
 
 <h1 class="text-center">
-    <b>@Html.DisplayFor(modelItem => Model.SurveyTitle)</b>
+    <b>xxxx</b>
 </h1>
 
 <hr />
@@ -14,89 +14,130 @@
     <div class="col-md-4">
         <form asp-action="FillSurvey">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            @Html.HiddenFor(x=>x.Survey.SurveyId)
+
             <div class="form-group">
-                @{
-                    int j = 0;
-                }
-                @foreach (var question in Model.Questions)
-                {
-                    int i = 0;
-
-                    int questionEnum = question.Type;
-                    string questionType = "";
-                    switch (questionEnum)
-                    {
-                        case 0:
-                            questionType = "input";
-                            break;
-                        case 1:
-                            questionType = "textarea";
-                            break;
-                        case 2:
-                            questionType = "radio";
-                            break;
-                        case 3:
-                            questionType = "checkbox";
-                            break;
-                        case 4:
-                            questionType = "rating";
-                            break;
-                        default:
-                            questionType = "input";
-                            break;
-                    }
-
-                    <div class="form-control-plaintext">
-                        <b>@Html.DisplayFor(modelItem => question.Title)</b>
-                    </div>
-
-                    @if (questionType.Equals("rating"))
-                    {
-                        @Html.Raw("<div class='d-flex'>")
-                    }
-
-                    @foreach (var option in question.Options)
-                    {
-                        if (questionType.Equals("textarea"))
-                        {
-                            <div class="form-group mb-2">
-                                <textarea class="form-control" rows="4"></textarea>
-                            </div>
-                        }
-                        else if (questionType.Equals("rating"))
-                        {
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="inlineRadioOptions-@j" id="inlineRadio-@i"
-                                       value="option-@i" />
-                                <label class="form-check-label" for="inlineRadio-@i">@i</label>
-                            </div>
-                        }
-                        else if (questionType.Equals("input"))
-                        {
-                            <div class="form-group mb-2">
-                                <input class="form-control" type="@questionType" />
-                            </div>
-                        }
-                        else
-                        {
-                            <div class="form-check mb-2">
-                                <input class="form-check-input" type="@questionType" name="exampleForm-@j" id="input-@i" />
-                                <label class="form-check-label" for="input-@i">
-                                    @option.Title
-                                </label>
-                            </div>
-                        }
-                        i++;
-                    }
-
-                    @if (questionType.Equals("rating"))
-                    {
-                        @Html.Raw("</div>")
-                    }
-                    j++;
-                    <hr />
-                }
+                <label for="Email">Email address</label>
+                <input type="email" class="form-control" placeholder="Enter email" id="Email" name="Email">
             </div>
+
+            @{
+                int k = 0;
+                bool radioTypeFlag = true;
+            }
+
+            @for (int i = 0; i < Model.Survey.Questions.Count(); i++)
+            {
+                var question = Model.Survey.Questions[i];
+                var nextQuestion = question;
+                var prevQuestion = question;
+                if (i != Model.Survey.Questions.Count()-1)
+                {
+                    nextQuestion = Model.Survey.Questions[i + 1];
+                }
+                if (i != 0)
+                {
+                    prevQuestion = Model.Survey.Questions[i -1];
+                }
+                int questionEnum = question.Type;
+                string questionType = "";
+                switch (questionEnum)
+                {
+                    case 0:
+                        questionType = "input";
+                        break;
+                    case 1:
+                        questionType = "textarea";
+                        break;
+                    case 2:
+                        questionType = "radio";
+                        break;
+                    case 3:
+                        questionType = "checkbox";
+                        break;
+                    case 4:
+                        questionType = "rating";
+                        break;
+                    default:
+                        questionType = "input";
+                        break;
+                }
+
+                <div class="form-control-plaintext">
+                    <b>@Html.DisplayFor(x => question.Title)</b>
+                </div>
+
+                @if (questionType.Equals("rating"))
+                {
+                    @Html.Raw("<div class='d-flex'>")
+                }
+                
+                radioTypeFlag = true;
+                @for (int j = 0; j < question.Options.Count(); j++)
+                {
+                    if (questionType.Equals("textarea"))
+                    {
+                        <div class="form-group mb-2">
+                            @Html.TextAreaFor(x=>Model.FilledSurveyOptions[k].Text, new{@class="form-control", @rows="4"})
+                            @Html.LabelFor(x => x.FilledSurveyOptions[k].Text, question.Options[j].Title)
+                            <input type="hidden" name="FilledSurveyOptions[@k].OptionId" value="@question.Options[j].Id" />
+                        </div>
+
+                    }
+                    else if (questionType.Equals("input"))
+                    {
+                        <div class="form-check mb-2">
+                            @Html.TextBoxFor(x=>Model.FilledSurveyOptions[k].Text, new{@class="form-control"})
+                            @Html.LabelFor(x => x.FilledSurveyOptions[k].Text, question.Options[j].Title)
+                            <input type="hidden" name="FilledSurveyOptions[@k].OptionId" value="@question.Options[j].Id" />
+                        </div>
+ 
+                    }
+                    else if (questionType.Equals("checkbox"))
+                    {
+                        <div class="form-check mb-2">
+                            @Html.CheckBoxFor(x=> Model.FilledSurveyOptions[k].IsChecked, new{@class="form-check-input"})
+                            @Html.LabelFor(x => x.FilledSurveyOptions[k].IsChecked, question.Options[j].Title)
+                            <input type="hidden" name="FilledSurveyOptions[@k].OptionId" value="@question.Options[j].Id" />
+                            @*@Html.HiddenFor(x=> Model.FilledSurveyOptions[k].OptionId,  new{ @value = @Model.Survey.Questions[i].Options[j].Id})*@
+                        </div>
+
+                    }
+                    else if (questionType.Equals("rating"))
+                    {
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" asp-for="@Model.FilledSurveyOptions[k].OptionId" value="@question.Options[j].Id" />
+                            <label class="form-check-label" id="FilledSurveyOptions_@(k)__OptionId">@question.Options[j].Title</label>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" asp-for="@Model.FilledSurveyOptions[k].OptionId" value="@question.Options[j].Id" />
+                            <span>@question.Options[j].Title</span>
+                        </div>
+                    }
+
+                    if (!(questionType.Equals("rating") || questionType.Equals("radio")) )
+                    {
+                        k++;
+                    }
+                }
+
+                if ((questionType.Equals("rating") || questionType.Equals("radio")))
+                {
+                    k++;
+                }
+
+                @if (questionType.Equals("rating"))
+                {
+                    @Html.Raw("</div>")
+                }
+
+
+            }
+
             <div class="form-group mt-5">
                 <input type="submit" value="Oyla" class="btn btn-primary" />
             </div>

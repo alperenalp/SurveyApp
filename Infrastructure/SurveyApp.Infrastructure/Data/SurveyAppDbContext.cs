@@ -15,6 +15,7 @@ namespace SurveyApp.Infrastructure.Data
         public DbSet<Question> Questions { get; set; }
         public DbSet<Option> Options { get; set; }
         public DbSet<FilledSurvey> FilledSurveys { get; set; }
+        public DbSet<FilledSurveyOption> FilledSurveyOptions { get; set; }
 
         public SurveyAppDbContext(DbContextOptions<SurveyAppDbContext> options) : base(options)
         {

@@ -86,6 +86,7 @@ namespace SurveyApp.API.Controllers
             List<QuestionDisplayVM> questionListVM = await getQuestionListVMAsync(surveyId);
             var model = new SurveyDisplayVM
             {
+                SurveyId = surveyId,
                 SurveyTitle = survey.Title,
                 Questions = questionListVM,
             };
@@ -102,10 +103,10 @@ namespace SurveyApp.API.Controllers
                 var optionListVM = new List<OptionDisplayVM>();
                 foreach (var option in options)
                 {
-                    var optionVM = new OptionDisplayVM { Title = option.Title };
+                    var optionVM = new OptionDisplayVM { Id = option.Id, Title = option.Title };
                     optionListVM.Add(optionVM);
                 }
-                var questionVM = new QuestionDisplayVM { Title = question.Title, Options = optionListVM, Type = question.Type};
+                var questionVM = new QuestionDisplayVM { Id = question.Id, Title = question.Title, Options = optionListVM, Type = question.Type };
                 questionListVM.Add(questionVM);
             }
 

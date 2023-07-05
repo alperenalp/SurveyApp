@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SurveyApp.DTOs.Requests;
 using SurveyApp.DTOs.Responses;
 using SurveyApp.Entities;
 using SurveyApp.MVC.Models;
@@ -9,13 +10,15 @@ namespace SurveyApp.MVC.Controllers
     public class SurveyController : Controller
     {
         private readonly ISurveyService _surveyService;
+        private readonly IFilledSurveyService _filledSurveyService;
         private readonly IQuestionService _questionService;
         private readonly IOptionService _optionService;
-        public SurveyController(ISurveyService surveyService, IOptionService optionService, IQuestionService questionService)
+        public SurveyController(ISurveyService surveyService, IOptionService optionService, IQuestionService questionService, IFilledSurveyService filledSurveyService)
         {
             _surveyService = surveyService;
             _optionService = optionService;
             _questionService = questionService;
+            _filledSurveyService = filledSurveyService;
         }
 
         public IActionResult Index()
@@ -23,26 +26,55 @@ namespace SurveyApp.MVC.Controllers
             return View();
         }
 
+        [HttpGet]
         public async Task<IActionResult> FillSurvey(int surveyId)
         {
             if (await _surveyService.IsSurveyExistsAsync(surveyId))
             {
-                SurveyDisplayVM model = await getSurveyDisplayModelAsync(surveyId);
+                SurveyAnswerDisplayVM model = await getSurveyAnswerRequestVMAsync(surveyId);
                 return View(model);
             }
             return NotFound();
         }
 
-        private async Task<SurveyDisplayVM> getSurveyDisplayModelAsync(int surveyId)
+
+        [HttpPost]
+        public async Task<IActionResult> FillSurvey(SurveyAnswerRequestVM model)
+        {
+            if (ModelState.IsValid)
+            {
+                var filledSurvey = getFilledSurveyRequest(model);
+                var filledSurveyId = await _filledSurveyService.CreateFilledSurveyAsync(filledSurvey);
+
+                if (await _filledSurveyService.IsFilledSurveyExistsAsync(filledSurveyId))
+                {
+                    await createFilledSurveyOptionsAsync(filledSurveyId, model.FilledSurveyOptions);
+                    return RedirectToAction("Index", "Home");
+                }
+                return RedirectToAction(nameof(FillSurvey));
+            }
+            return View(ModelState);
+        }
+
+        private async Task<SurveyAnswerDisplayVM> getSurveyAnswerRequestVMAsync(int surveyId)
         {
             var survey = await _surveyService.GetSurveyByIdAsync(surveyId);
             List<QuestionDisplayVM> questionListVM = await getQuestionListVMAsync(surveyId);
-            var model = new SurveyDisplayVM
+            var surveyDisplayVM = getSurveyDisplayVM(survey, questionListVM);
+            return new SurveyAnswerDisplayVM
             {
+                Survey = surveyDisplayVM
+            };
+        }
+
+        private static SurveyDisplayVM getSurveyDisplayVM(SurveyDisplayResponse survey, List<QuestionDisplayVM> questionListVM)
+        {
+            return new SurveyDisplayVM
+            {
+                SurveyId = survey.Id,
                 SurveyTitle = survey.Title,
                 Questions = questionListVM,
             };
-            return model;
         }
 
         private async Task<List<QuestionDisplayVM>> getQuestionListVMAsync(int surveyId)
@@ -55,20 +87,65 @@ namespace SurveyApp.MVC.Controllers
                 var optionListVM = new List<OptionDisplayVM>();
                 foreach (var option in options)
                 {
-                    var optionVM = new OptionDisplayVM { Title = option.Title };
+                    var optionVM = getOptionDisplayVM(option);
                     optionListVM.Add(optionVM);
                 }
-                var questionVM = new QuestionDisplayVM { Title = question.Title, Options = optionListVM, Type = question.Type };
+                var questionVM = getQuestionVM(question, optionListVM);
                 questionListVM.Add(questionVM);
             }
 
             return questionListVM;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> FillSurvey()
+        private static OptionDisplayVM getOptionDisplayVM(OptionDisplayResponse option)
         {
-            return View();
+            return new OptionDisplayVM
+            {
+                Id = option.Id,
+                Title = option.Title
+            };
+        }
+
+        private static QuestionDisplayVM getQuestionVM(QuestionDisplayResponse question, List<OptionDisplayVM> optionListVM)
+        {
+            return new QuestionDisplayVM
+            {
+                Id = question.Id,
+                Title = question.Title,
+                Options = optionListVM,
+                Type = question.Type
+            };
+        }
+
+
+
+        private CreateNewFilledSurveyRequest getFilledSurveyRequest(SurveyAnswerRequestVM model)
+        {
+            return new CreateNewFilledSurveyRequest
+            {
+                CreatedAt = DateTime.Now,
+                Email = model.Email,
+                SurveyId = model.Survey.SurveyId
+            };
+        }
+
+        private async Task createFilledSurveyOptionsAsync(int filledSurveyId, IList<FilledSurveyOptionVM> filledSurveyOptionsVM)
+        {
+            foreach (var filledSurveyOptionVM in filledSurveyOptionsVM)
+            {
+                var filledSurveyOption = getFilledSurveyOptionRequest(filledSurveyId, filledSurveyOptionVM);
+                await _filledSurveyService.CreateFilledSurveyOptionAsync(filledSurveyOption);
+            }
+        }
+
+        private static CreateNewFilledSurveyOptionRequest getFilledSurveyOptionRequest(int filledSurveyId, FilledSurveyOptionVM filledSurveyOptionVM)
+        {
+            return new CreateNewFilledSurveyOptionRequest
+            {
+                FilledSurveyId = filledSurveyId,
+                OptionId = filledSurveyOptionVM.OptionId,
+                Text = filledSurveyOptionVM.Text,
+            };
         }
     }
 }

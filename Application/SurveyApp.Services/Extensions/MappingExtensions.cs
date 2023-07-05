@@ -65,5 +65,19 @@ namespace SurveyApp.Services.Extensions
         {
             return mapper.Map<User>(request);
         }
+
+
+        //FilledSurvey
+        public static FilledSurvey ConvertToFilledSurvey<T>(this T request, IMapper mapper)
+        {
+            return mapper.Map<FilledSurvey>(request);
+        }
+
+
+        //FilledSurveyOption
+        public static FilledSurveyOption ConvertToFilledSurveyOption<T>(this T request, IMapper mapper)
+        {
+            return mapper.Map<FilledSurveyOption>(request);
+        }
     }
 }
