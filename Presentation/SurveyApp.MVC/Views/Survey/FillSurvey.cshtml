@@ -24,22 +24,11 @@
 
             @{
                 int k = 0;
-                bool radioTypeFlag = true;
             }
 
             @for (int i = 0; i < Model.Survey.Questions.Count(); i++)
             {
                 var question = Model.Survey.Questions[i];
-                var nextQuestion = question;
-                var prevQuestion = question;
-                if (i != Model.Survey.Questions.Count()-1)
-                {
-                    nextQuestion = Model.Survey.Questions[i + 1];
-                }
-                if (i != 0)
-                {
-                    prevQuestion = Model.Survey.Questions[i -1];
-                }
                 int questionEnum = question.Type;
                 string questionType = "";
                 switch (questionEnum)
@@ -73,7 +62,6 @@
                     @Html.Raw("<div class='d-flex'>")
                 }
                 
-                radioTypeFlag = true;
                 @for (int j = 0; j < question.Options.Count(); j++)
                 {
                     if (questionType.Equals("textarea"))
@@ -100,7 +88,6 @@
                             @Html.CheckBoxFor(x=> Model.FilledSurveyOptions[k].IsChecked, new{@class="form-check-input"})
                             @Html.LabelFor(x => x.FilledSurveyOptions[k].IsChecked, question.Options[j].Title)
                             <input type="hidden" name="FilledSurveyOptions[@k].OptionId" value="@question.Options[j].Id" />
-                            @*@Html.HiddenFor(x=> Model.FilledSurveyOptions[k].OptionId,  new{ @value = @Model.Survey.Questions[i].Options[j].Id})*@
                         </div>
 
                     }
@@ -134,7 +121,6 @@
                 {
                     @Html.Raw("</div>")
                 }
-
 
             }
 

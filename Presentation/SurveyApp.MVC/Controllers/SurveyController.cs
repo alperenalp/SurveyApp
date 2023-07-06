@@ -48,12 +48,56 @@ namespace SurveyApp.MVC.Controllers
 
                 if (await _filledSurveyService.IsFilledSurveyExistsAsync(filledSurveyId))
                 {
-                    await createFilledSurveyOptionsAsync(filledSurveyId, model.FilledSurveyOptions);
+                    var extractedOptions = await getNotCheckedCheckboxExtractedFSOptionsAsync(model);
+                    await createFilledSurveyOptionsAsync(filledSurveyId, extractedOptions);
+
                     return RedirectToAction("Index", "Home");
                 }
                 return RedirectToAction(nameof(FillSurvey));
             }
             return View(ModelState);
+        }
+
+        private async Task<List<FilledSurveyOptionVM>> getNotCheckedCheckboxExtractedFSOptionsAsync(SurveyAnswerRequestVM model)
+        {
+            var questions = await getQuestionListVMAsync(model.Survey.SurveyId);
+            var checkedOptions = getCheckedFilledSurveyOptions(model.FilledSurveyOptions);
+            var extractedOptions = new List<FilledSurveyOptionVM>();
+            foreach (var question in questions)
+            {
+                if (!question.Type.Equals(3)) //checkbox
+                {
+                    foreach (var option in question.Options)
+                    {
+                        foreach (var fsOption in model.FilledSurveyOptions)
+                        {
+                            if (fsOption.OptionId == option.Id)
+                            {
+                                extractedOptions.Add(fsOption);
+                            }
+                        }
+                    }
+                }
+            }
+            foreach (var checkedOption in checkedOptions)
+            {
+                extractedOptions.Add(checkedOption);
+            }
+
+            return extractedOptions;
+        }
+
+        private IList<FilledSurveyOptionVM> getCheckedFilledSurveyOptions(IList<FilledSurveyOptionVM> filledSurveyOptionsVM)
+        {
+            var checkedOptions = new List<FilledSurveyOptionVM>();
+            foreach (var checkboxOption in filledSurveyOptionsVM)
+            {
+                if (checkboxOption.IsChecked)
+                {
+                    checkedOptions.Add(checkboxOption);
+                }
+            }
+            return checkedOptions;
         }
 
         private async Task<SurveyAnswerDisplayVM> getSurveyAnswerRequestVMAsync(int surveyId)
