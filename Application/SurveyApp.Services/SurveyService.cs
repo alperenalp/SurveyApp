@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using SurveyApp.DTOs.Requests;
 using SurveyApp.DTOs.Responses;
+using SurveyApp.Entities;
 using SurveyApp.Infrastructure.Repositories;
 using SurveyApp.Services.Extensions;
 using System;
@@ -28,6 +29,34 @@ namespace SurveyApp.Services
             survey.CreatedAt = DateTime.Now;
             int surveyId = await _repository.CreateSurveyAsync(survey);
             return surveyId;
+        }
+
+        public async Task<IEnumerable<SurveyDisplayResponse>> GetAllAsync()
+        {
+            var surveys = await _repository.GetAllAsync();
+            var response = surveys.ConvertToDto<IEnumerable<SurveyDisplayResponse>>(_mapper);
+            return response;
+        }
+
+        public async Task<IEnumerable<FilledSurveyDisplayResponse>> GetAllFilledSurveyAsync()
+        {
+            var filledSurveys = await _repository.GetAllFilledSurveyAsync();
+            var response = filledSurveys.ConvertToDto<IEnumerable<FilledSurveyDisplayResponse>>(_mapper);
+            return response;
+        }
+
+        public async Task<IEnumerable<FilledSurveyOptionDisplayResponse>> GetFilledSurveyOptionsByFSId(int filledSurveyId)
+        {
+            var filledSurveyOptions = await _repository.GetFilledSurveyOptionsByFSId(filledSurveyId);
+            var response = filledSurveyOptions.ConvertToDto<IEnumerable<FilledSurveyOptionDisplayResponse>>(_mapper);
+            return response;
+        }
+
+        public async Task<IEnumerable<FilledSurveyDisplayResponse>> GetFilledSurveyListBySurveyIdAsync(int surveyId)
+        {
+            var filledSurveys = await _repository.GetFilledSurveyListBySurveyIdAsync(surveyId);
+            var response = filledSurveys.ConvertToDto<IEnumerable<FilledSurveyDisplayResponse>>(_mapper);
+            return response;
         }
 
         public async Task<SurveyDisplayResponse> GetSurveyByIdAsync(int id)

@@ -1,0 +1,59 @@
+﻿@model SurveyApp.MVC.Models.StatisticsCollection
+
+@{
+    ViewData["Title"] = "Statistics";
+}
+
+<h1>Statistics</h1>
+
+<div class="row">
+    <div>
+        <p>Total Answer: @Model.TotalFilledSurveys()</p>
+    </div>
+    <div>
+        @{
+
+            foreach (var question in Model.Questions)
+            {
+                <div class="form-control-plaintext">
+                    <b>@Html.DisplayFor(x => question.Title)</b>
+                </div>
+
+                int totalCount = 0;
+                int count = 0;
+                var questionOptions = Model.QuestionOptions(question.Id);
+                var groupedOptions = @Model.CountOptions(questionOptions);
+                foreach (var x in groupedOptions)
+                {
+                    count = (int)x.GetType().GetProperty("Count").GetValue(x, null);
+                    totalCount += count;
+                }
+                foreach (var groupedOption in groupedOptions)
+                {
+                    int optionId = (int)groupedOption.GetType().GetProperty("OptionId").GetValue(groupedOption, null);
+                    var currentOptionCount = (int)groupedOption.GetType().GetProperty("Count").GetValue(groupedOption, null);
+
+                    string title = "";
+                    foreach (var option in question.Options)
+                    {
+                        if (option.Id == optionId)
+                        {
+                            title = option.Title;
+                        }
+                    }
+                    <p>@title -----> @currentOptionCount : %@(@currentOptionCount / (double)totalCount * 100) </p>
+                }
+
+
+            }
+
+
+        }
+
+
+    </div>
+</div>
+<div>
+    @Html.ActionLink("Edit", "Edit", new { /* id = Model.PrimaryKey */ }) |
+    <a asp-action="Index">Back to List</a>
+</div>

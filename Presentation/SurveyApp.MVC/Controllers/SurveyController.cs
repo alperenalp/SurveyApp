@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.Options;
+using Microsoft.VisualBasic.FileIO;
 using SurveyApp.DTOs.Requests;
 using SurveyApp.DTOs.Responses;
 using SurveyApp.Entities;
@@ -13,17 +16,21 @@ namespace SurveyApp.MVC.Controllers
         private readonly IFilledSurveyService _filledSurveyService;
         private readonly IQuestionService _questionService;
         private readonly IOptionService _optionService;
-        public SurveyController(ISurveyService surveyService, IOptionService optionService, IQuestionService questionService, IFilledSurveyService filledSurveyService)
+        private readonly IUserService _userService;
+        public SurveyController(ISurveyService surveyService, IOptionService optionService, IQuestionService questionService, IFilledSurveyService filledSurveyService, IUserService userService)
         {
             _surveyService = surveyService;
             _optionService = optionService;
             _questionService = questionService;
             _filledSurveyService = filledSurveyService;
+            _userService = userService;
         }
 
-        public IActionResult Index()
+        [HttpGet]
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var surveys = await _surveyService.GetAllAsync();
+            return View(surveys);
         }
 
         [HttpGet]
@@ -58,9 +65,106 @@ namespace SurveyApp.MVC.Controllers
             return View(ModelState);
         }
 
+
+        [HttpGet("[action]")]
+        public async Task<IActionResult> Statistics(int surveyId)
+        {
+            var survey = await _surveyService.GetSurveyByIdAsync(surveyId);
+
+            var questionListVM = await getQuestionDisplayVMListAsync(surveyId);
+
+            var filledSurveys = await _surveyService.GetFilledSurveyListBySurveyIdAsync(surveyId);
+
+            var filledSurveyListVM = await getFilledSurveyDisplayVMListAsync(surveyId, filledSurveys, questionListVM);
+
+            var model = getStatisticsDisplayVM(survey, questionListVM, filledSurveyListVM);
+
+            return View(model);
+        }
+
+
+        private async Task<List<FilledSurveyDisplayVM>> getFilledSurveyDisplayVMListAsync(int surveyId, IEnumerable<FilledSurveyDisplayResponse> filledSurveys, List<QuestionDisplayVM> questionListVM)
+        {
+            var filledSurveyListVM = new List<FilledSurveyDisplayVM>();
+            foreach (var filledSurvey in filledSurveys)
+            {
+                var filledSurveyVM = await getFilledSurveyDisplayVMAsync(surveyId, filledSurvey);
+
+                filledSurveyListVM.Add(filledSurveyVM);
+            }
+
+            return filledSurveyListVM;
+        }
+
+        private async Task<FilledSurveyDisplayVM> getFilledSurveyDisplayVMAsync(int surveyId, FilledSurveyDisplayResponse filledSurvey)
+        {
+            var filledSurveyOptions = await _surveyService.GetFilledSurveyOptionsByFSId(filledSurvey.Id);
+            var filledSurveyOptionListVM = await getFilledSurveyOptionListVMAsync(filledSurveyOptions, surveyId);
+            var filledSurveyVM = new FilledSurveyDisplayVM
+            {
+                CreatedAt = filledSurvey.CreatedAt,
+                Email = filledSurvey.Email,
+                Id = filledSurvey.Id,
+                SurveyId = surveyId,
+                FilledSurveyOptions = filledSurveyOptionListVM,
+            };
+            return filledSurveyVM;
+        }
+
+        private async Task<List<FilledSurveyOptionVM>> getFilledSurveyOptionListVMAsync(IEnumerable<FilledSurveyOptionDisplayResponse> filledSurveyOptions, int surveyId)
+        {
+            var filledSurveyOptionsVM = new List<FilledSurveyOptionVM>();
+            foreach (var filledSurveyOption in filledSurveyOptions)
+            {
+                var optionVM = await getOptionDisplayVMAsync(filledSurveyOption, surveyId);
+                var filledSurveyOptionVM = new FilledSurveyOptionVM
+                {
+                    OptionId = filledSurveyOption.OptionId,
+                    Text = filledSurveyOption.Text,
+                    Option = optionVM,
+                };
+
+                filledSurveyOptionsVM.Add(filledSurveyOptionVM);
+            }
+
+            return filledSurveyOptionsVM;
+        }
+
+        private async Task<OptionDisplayVM> getOptionDisplayVMAsync(FilledSurveyOptionDisplayResponse filledSurveyOption, int surveyId)
+        {
+            var questionListVM = await getQuestionDisplayVMListAsync(surveyId);
+            var optionVM = new OptionDisplayVM();
+            foreach (var question in questionListVM)
+            {
+                foreach (var option in question.Options)
+                {
+                    if (filledSurveyOption.OptionId == option.Id)
+                    {
+                        optionVM.Id = option.Id;
+                        optionVM.Title = option.Title;
+                        optionVM.Question = question;
+                    }
+                }
+            }
+
+            return optionVM;
+        }
+
+        private StatisticsCollection getStatisticsDisplayVM(SurveyDisplayResponse survey, IList<QuestionDisplayVM> questionListVM, IList<FilledSurveyDisplayVM> filledSurveyListVM)
+        {
+            return new StatisticsCollection
+            {
+                SurveyId = survey.Id,
+                SurveyTitle = survey.Title,
+                CreatedAt = survey.CreatedAt,
+                Questions = questionListVM,
+                FilledSurveys = filledSurveyListVM,
+            };
+        }
+
         private async Task<List<FilledSurveyOptionVM>> getNotCheckedCheckboxExtractedFSOptionsAsync(SurveyAnswerRequestVM model)
         {
-            var questions = await getQuestionListVMAsync(model.Survey.SurveyId);
+            var questions = await getQuestionDisplayVMListAsync(model.Survey.SurveyId);
             var checkedOptions = getCheckedFilledSurveyOptions(model.FilledSurveyOptions);
             var extractedOptions = new List<FilledSurveyOptionVM>();
             foreach (var question in questions)
@@ -103,7 +207,7 @@ namespace SurveyApp.MVC.Controllers
         private async Task<SurveyAnswerDisplayVM> getSurveyAnswerRequestVMAsync(int surveyId)
         {
             var survey = await _surveyService.GetSurveyByIdAsync(surveyId);
-            List<QuestionDisplayVM> questionListVM = await getQuestionListVMAsync(surveyId);
+            List<QuestionDisplayVM> questionListVM = await getQuestionDisplayVMListAsync(surveyId);
             var surveyDisplayVM = getSurveyDisplayVM(survey, questionListVM);
             return new SurveyAnswerDisplayVM
             {
@@ -121,7 +225,7 @@ namespace SurveyApp.MVC.Controllers
             };
         }
 
-        private async Task<List<QuestionDisplayVM>> getQuestionListVMAsync(int surveyId)
+        private async Task<List<QuestionDisplayVM>> getQuestionDisplayVMListAsync(int surveyId)
         {
             var questionListVM = new List<QuestionDisplayVM>();
             var questions = await _questionService.GetQuestionsBySurveyIdAsync(surveyId);

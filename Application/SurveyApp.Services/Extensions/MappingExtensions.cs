@@ -16,6 +16,11 @@ namespace SurveyApp.Services.Extensions
             return mapper.Map<T>(survey);
         }
 
+        public static T ConvertToDto<T>(this IList<Survey> request, IMapper mapper)
+        {
+            return mapper.Map<T>(request);
+        }
+
         public static Survey ConvertToSurvey<T>(this T request, IMapper mapper)
         {
             return mapper.Map<Survey>(request);
@@ -73,11 +78,21 @@ namespace SurveyApp.Services.Extensions
             return mapper.Map<FilledSurvey>(request);
         }
 
+        public static T ConvertToDto<T>(this IList<FilledSurvey> request, IMapper mapper)
+        {
+            return mapper.Map<T>(request);
+        }
+
 
         //FilledSurveyOption
         public static FilledSurveyOption ConvertToFilledSurveyOption<T>(this T request, IMapper mapper)
         {
             return mapper.Map<FilledSurveyOption>(request);
+        }
+
+        public static T ConvertToDto<T>(this IList<FilledSurveyOption> request, IMapper mapper)
+        {
+            return mapper.Map<T>(request);
         }
     }
 }

@@ -61,7 +61,22 @@ namespace SurveyApp.Infrastructure.Repositories
 
         public async Task<Survey> GetByIdForFillAsync(int id)
         {
-            return await _context.Surveys.AsNoTracking().Include(x=>x.Questions).ThenInclude(x=>x.Options).SingleOrDefaultAsync(x => x.Id == id);
+            return await _context.Surveys.AsNoTracking().Include(x => x.Questions).ThenInclude(x => x.Options).SingleOrDefaultAsync(x => x.Id == id);
+        }
+
+        public async Task<IList<FilledSurvey>> GetAllFilledSurveyAsync()
+        {
+            return await _context.FilledSurveys.AsNoTracking().ToListAsync();
+        }
+
+        public async Task<IList<FilledSurveyOption>> GetFilledSurveyOptionsByFSId(int filledSurveyId)
+        {
+            return await _context.FilledSurveyOptions.AsNoTracking().Where(x => x.FilledSurveyId == filledSurveyId).ToListAsync();
+        }
+
+        public async Task<IList<FilledSurvey>> GetFilledSurveyListBySurveyIdAsync(int surveyId)
+        {
+            return await _context.FilledSurveys.AsNoTracking().Where(x => x.SurveyId == surveyId).ToListAsync();
         }
     }
 }
